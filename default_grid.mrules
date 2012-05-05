@@ -23,7 +23,9 @@ features
 		tourism museum : tourism=museum
 		amenity pub : amenity=pub
 		amenity fast_food : amenity=fast_food
-		grid letter : grid=letter
+		grid letter : grid=letter AND (letter:pos=top OR letter:pos=bottom)
+		grid number : grid=letter AND (letter:pos=left OR letter:pos=right)
+		grid debug : grid=letter AND (debug=origin)
 
 	// These are not shown on Mapnik
 		puffin : crossing_ref=puffin
@@ -763,8 +765,8 @@ rules
 			text-offset-vertical : 0
 			text-offset-horizontal : 0
 			font-size : 20
-			text-color : #2B80FE
-			text : [[letter:no]]
+			text-color : #FE802B
+			text : @if(conflict, "!" [[letter:no]] "!", [[letter:no]])
 		draw : text
 
 	target : grid letter
@@ -774,7 +776,17 @@ rules
 			text-offset-horizontal : 0
 			font-size : 20
 			text-color : #2B80FE
-			text : [[letter:alph]]
+			text : @if(conflict, "!" [[letter:alph]] "!", [[letter:alph]])
+		draw : text
+
+	target : grid debug
+		define
+			min-zoom : 13
+			text-offset-vertical : 0
+			text-offset-horizontal : 0
+			font-size : 20
+			text-color : #2B80FE
+			text : @if(debug, "X")
 		draw : text
 
 	//\\grid style

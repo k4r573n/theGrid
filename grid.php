@@ -10,6 +10,17 @@
 //			exit 0;
 //	}
 
+/**
+ *
+ *  BUGS:
+ *  - crasy things happens if xpos ypos is in the bbox
+ *	- ?
+ *
+ *
+ *
+ *
+ */
+
  //differenz between two lines e.g. equivalent to 500m
  //static $delta_x = 0.007328667;
  //static $delta_y = 0.00449325;
@@ -39,8 +50,12 @@
  //$xpos = $_GET['xpos'];
  //$ypos = $_GET['ypos'];
 
- $xpos = $left+$boarder_width;
- $ypos = $top-$boarder_high;
+ //$xpos = $left;
+ //$ypos = $top;
+ //$xpos = $left+$boarder_width;
+ //$ypos = $top-$boarder_high;
+ $xpos = $left-1*$delta_x;
+ $ypos = $top+1*$delta_y;
 
 /**
  * param: $id e.g. 0, 1, 2, or any int >= 0 - used to calc object ids (1=>-1,-2,-3)
@@ -75,13 +90,13 @@ function hline($id, $y_pos, $tags){
   "\t</way>\n";
 }
 
-function letter($id, $x, $y, $position) {
+function letter($id, $x, $y, $position, $tag) {
 	global $time, $user;
 	print "\t<node id='$id' timestamp='$time' user='$user' visible='true' version='1' lat='$y' lon='$x'>\n".
 		"\t\t<tag k='grid' v='letter' />\n".
 		"\t\t<tag k='letter:no' v='$position' />\n".
 		"\t\t<tag k='letter:alph' v='".num2alph($position)."' />\n".
-		"\t\t<tag k='name' v='".num2alph($position)."' />\n".
+		"\t\t$tag\n".
 		"\t</node>\n";
 }
 
@@ -139,30 +154,48 @@ function mod($big, $div) {
 
 
 	//where begin/end to Count
-	$xstart = ($left - $xpos) / $delta_x;
-	$xend	  = ($right - $xpos) / $delta_x;
-	$ystart = ($ypos - $top) / $delta_y;
-	$yend   = ($ypos - $bottom) / $delta_y;
-	//
-	//where is the first line
+	$xstart = floor(($left - $xpos) / $delta_x);//idx of first column intersecting bbox
+	$xend	  = ceil(($right - $xpos) / $delta_x);//idx of last column intersecting bbox
+	$ystart = floor(($ypos - $top) / $delta_y);//idx of first row intersecting bbox
+	$yend   = ceil(($ypos - $bottom) / $delta_y);//idx of last row intersecting bbox
+	
+	//where is the first line - % didn't work
 	$xoffset = $delta_x - mod(floor(($left - $xpos)*10000)/10000, $delta_x);
-	$yoffset = $delta_y - mod(($ypos - $top), $delta_y);
+	$yoffset = $delta_y - mod(floor(($ypos - $top)*10000)/10000, $delta_y);
 
 
 	//generate Text
 	//left/right
 	for ($i=0; $i<$yend-$ystart; $i++) {
-		letter($nid+$i*2, $left+($boarder_width/2), $top-$yoffset+$delta_y/2-$i*$delta_y, $ystart+$i);
-		letter($nid+$i*2+1, $right-($boarder_width/2), $top-$yoffset+$delta_y/2-$i*$delta_y, $ystart+$i);
+		$tag = "";
+		$tmp_ypos = $top-$yoffset+$delta_y/2-$i*$delta_y;
+		if (($tmp_ypos > $top)||($tmp_ypos < $bottom)) continue;
+		if ($tmp_ypos > $top-$boarder_high)
+		 	$tag = "\n\t\t<tag k='conflict' v='top' />";
+		elseif ($tmp_ypos < $bottom+$boarder_high)
+		 	$tag = "\n\t\t<tag k='conflict' v='bottom' />";
+		letter($nid+$i*2, $left+($boarder_width/2), $tmp_ypos, $ystart+$i, "<tag k='letter:pos' v='left' />$tag");
+		letter($nid+$i*2+1, $right-($boarder_width/2), $tmp_ypos, $ystart+$i, "<tag k='letter:pos' v='right' />$tag");
 	}
 	$nid = $nid+$i*2;//next ID
 
 	//top/bottom
 	for ($i=0; $i<$xend-$xstart; $i++) {
-		letter($nid+$i*2, $left+$xoffset+$delta_x/2+$i*$delta_x, $top-($boarder_high/2), $xstart+$i);
-		letter($nid+$i*2+1, $left+$xoffset+$delta_x/2+$i*$delta_x, $bottom+($boarder_high/2), $xstart+$i);
+		$tag = "";
+		$tmp_xpos = $left+$xoffset-$delta_x/2+$i*$delta_x;
+		if (($tmp_xpos > $right)||($tmp_xpos < $left)) continue;
+		if ($tmp_xpos > $right-$boarder_width)
+		 	$tag = "\n\t\t<tag k='conflict' v='right' />";
+		elseif ($tmp_xpos < $left+$boarder_width)
+		 	$tag = "\n\t\t<tag k='conflict' v='left' />";
+		letter($nid+$i*2, $tmp_xpos, $top-($boarder_high/2), $xstart+$i, "<tag k='letter:pos' v='top' />$tag");
+		letter($nid+$i*2+1, $tmp_xpos, $bottom+($boarder_high/2), $xstart+$i, "<tag k='letter:pos' v='bottom' />$tag");
 	}
 	$nid = $nid+$i*2;//next ID
+
+	//debug
+	letter($nid, $xpos, $ypos, 0, "<tag k='debug' v='origin' />");
+	$nid = $nid + 1;
 
 
 
