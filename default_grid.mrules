@@ -23,6 +23,7 @@ features
 		tourism museum : tourism=museum
 		amenity pub : amenity=pub
 		amenity fast_food : amenity=fast_food
+		grid letter : grid=letter
 
 	// These are not shown on Mapnik
 		puffin : crossing_ref=puffin
@@ -60,8 +61,9 @@ features
 		aeroway terminal : aeroway=terminal
 		
 	lines
-		grid : grid=line
-		grid_border : grid=boarder
+		grid conflict : grid=line AND (conflict="top" OR conflict="bottom"  OR conflict="left"  OR conflict="right")
+		grid lines : grid=line AND NOT (conflict="top" OR conflict="bottom"  OR conflict="left"  OR conflict="right")
+		grid boarder : grid=boarder
 		oneway : oneway=yes OR oneway=true OR oneway=-1
 		coastline : natural=coastline
 		river : waterway=river 
@@ -285,6 +287,7 @@ rules
 				fill-color : #A9CAAE
 		elseif : building
 			define
+				//fill-color : #FF0000
 				fill-color : #BCA9A9
 		elseif : leisure pitch
 			define
@@ -730,6 +733,51 @@ rules
 			line-color : #B5D0D0
 			line-width : 13:1;15:2
 		draw : line
+
+	//grid style
+
+	target : grid conflict
+		define
+			min-zoom : 13
+			line-color : #FF0000
+			line-width : 1
+		draw : line
+
+	target : grid lines
+		define
+			min-zoom : 13
+			line-color : #0000FF
+			line-width : 1
+		draw : line
+
+	target : grid boarder
+		define
+			min-zoom : 13
+			line-color : #FF00FF
+			line-width : 3
+		draw : line
+
+	target : grid number
+		define
+			min-zoom : 13
+			text-offset-vertical : 0
+			text-offset-horizontal : 0
+			font-size : 20
+			text-color : #2B80FE
+			text : [[letter:no]]
+		draw : text
+
+	target : grid letter
+		define
+			min-zoom : 13
+			text-offset-vertical : 0
+			text-offset-horizontal : 0
+			font-size : 20
+			text-color : #2B80FE
+			text : [[letter:alph]]
+		draw : text
+
+	//\\grid style
 		
 	target: parking
 		define
