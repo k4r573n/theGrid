@@ -23,6 +23,7 @@ features
 		tourism museum : tourism=museum
 		amenity pub : amenity=pub
 		amenity fast_food : amenity=fast_food
+		//GRID POIs
 		grid letter : grid=letter AND (letter:pos=top OR letter:pos=bottom)
 		grid number : grid=letter AND (letter:pos=left OR letter:pos=right)
 		grid debug : grid=letter AND (debug=origin)
@@ -289,7 +290,6 @@ rules
 				fill-color : #A9CAAE
 		elseif : building
 			define
-				//fill-color : #FF0000
 				fill-color : #BCA9A9
 		elseif : leisure pitch
 			define

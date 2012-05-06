@@ -1,9 +1,10 @@
-##############################################
+###################################################################
 #     #
 #     # The Grid
 #     #
-######################################
-#     # do what ever you want license
+###################################################
+#     # Karsten Hinz <k.hinz@tu-bs.de>
+#     # this project is available under BSD-License
 #     # 
 #     #
 #     #
@@ -11,7 +12,7 @@
 #
 
 Describtion:
-''''''''''''
+````````````
 This script generates a map grid in osm xml.
 
 Parameter
@@ -20,8 +21,9 @@ Parameter
  - delta_X,delta_y							(x/y difference between two lines in degree)
  - boarder_high/boarder_width		(size of the grid boarder)
 
+
 Usage:
-''''''
+``````
 Use my script with get request (URL-Comming soon)
 Or download the PHP-File and run it localy.
 After you have done this you can load it as source in Maperitive and apply
@@ -29,6 +31,16 @@ a special renderrule to visualize the grid. (See Examples)
 
 
 Examples:
-'''''''''
+`````````
 Comming soon
 
+
+TODO:
+`````
+- FIX Bugs
+- JSON-Output
+
+
+Bugs:
+`````
+- crazy things happen if xpos,ypos is in the map area
