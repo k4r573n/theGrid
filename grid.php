@@ -21,41 +21,60 @@
  *
  */
 
- //differenz between two lines e.g. equivalent to 500m
- //static $delta_x = 0.007328667;
- //static $delta_y = 0.00449325;
+//differenz between two lines e.g. equivalent to 500m
+//$delta_x = 0.007328667;
+//$delta_y = 0.00449325;
+$delta_x = 0.0007328667;
+$delta_y = 0.000449325;
 
- //static $boarder_high = 0.000449325;
- //static $boarder_width = 0.0007328667;
- static $delta_x = 0.0007328667;
- static $delta_y = 0.000449325;
+if (isset($_GET['delta_x']))
+	$delta_x = $_GET['delta_x'];
+if (isset($_GET['delta_y']))
+	$delta_y = $_GET['delta_y'];
 
- static $boarder_width = 0.0007328667;
- static $boarder_high = 0.000449325;
+$boarder_high = 0.000449325;
+$boarder_width = 0.0007328667;
+//static $boarder_width = 0.0007328667;
+//static $boarder_high = 0.000449325;
 
- static $time = "2009-08-29T13:05:43Z";
- static $user = "none";
+if (isset($_GET['boarder_width']))
+	$boarder_width = $_GET['boarder_width'];
+if (isset($_GET['boarder_high']))
+	$boarder_high = $_GET['boarder_high'];
 
-// $left = $_GET['left'];
-// $right = $_GET['right'];
-// $top = $_GET['top'];
-// $bottom = $_GET['bottom'];
 
- static $left = 10.5321550369263;
- static $right = 10.5363178253174;
- static $top = 52.2712562711988;
- static $bottom = 52.2697068495611;
+static $time = "2009-08-29T13:05:43Z";//Todo
+static $user = "theGrid";
 
-	//the start position of the grid (e.g. top left corner)
- //$xpos = $_GET['xpos'];
- //$ypos = $_GET['ypos'];
+
+$left = 10.5321550369263;
+$right = 10.5363178253174;
+$top = 52.2712562711988;
+$bottom = 52.2697068495611;
+
+if (isset($_GET['left']))
+	$left = $_GET['left'];
+if (isset($_GET['right']))
+	$right = $_GET['right'];
+if (isset($_GET['top']))
+	$top = $_GET['top'];
+if (isset($_GET['bottom']))
+	$bottom = $_GET['bottom'];
+
 
  //$xpos = $left;
  //$ypos = $top;
  //$xpos = $left+$boarder_width;
  //$ypos = $top-$boarder_high;
- $xpos = $left-1*$delta_x;
- $ypos = $top+1*$delta_y;
+
+//the start position of the grid (e.g. top left corner)
+$xpos = $left-1*$delta_x;
+$ypos = $top+1*$delta_y;
+ 
+if (isset($_GET['xpos']))
+ $xpos = $_GET['xpos'];
+if (isset($_GET['ypos']))
+ $ypos = $_GET['ypos'];
 
 /**
  * param: $id e.g. 0, 1, 2, or any int >= 0 - used to calc object ids (1=>-1,-2,-3)
@@ -69,7 +88,6 @@ function vline($id, $x_pos, $tags){
   print "\t<way id='".(-3*$id-3)."' timestamp='$time' user='$user' visible='true' version='1'>\n".
     "\t\t<nd ref='".(-3*$id-1)."' />\n".
     "\t\t<nd ref='".(-3*$id-2)."' />\n".
-    //"\t\t<tag k='highway' v='primary' />\n".
 		"\t\t$tags\n".
   "\t</way>\n";
 }
@@ -85,7 +103,6 @@ function hline($id, $y_pos, $tags){
   print "\t<way id='".(-3*$id-3)."' timestamp='$time' user='$user' visible='true' version='1'>\n".
     "\t\t<nd ref='".(-3*$id-1)."' />\n".
     "\t\t<nd ref='".(-3*$id-2)."' />\n".
-    //"\t\t<tag k='highway' v='primary' />\n".
 		"\t\t$tags\n".
   "\t</way>\n";
 }
@@ -223,14 +240,5 @@ function mod($big, $div) {
 	}
 	$nid = $nid+$i;//next ID
 
-//	for ($i=0; $i < 
-//  <node id='-1' timestamp='2009-08-29T13:05:43Z' user='none' visible='true' version='1' lat='52.2697068495611' lon='10.5322' />
-//  <node id='-2' timestamp='2009-08-29T13:05:43Z' user='none' visible='true' version='1' lat='52.2712562711988' lon='10.5322' />
-//
-//  <way id='-3' timestamp='2009-09-08T08:07:17Z' user='none' visible='true' version='3'>
-//    <nd ref='-1' />
-//    <nd ref='-2' />
-//    <tag k='highway' v='primary' />
-//  </way>
 	print "</osm>\n";
 ?>

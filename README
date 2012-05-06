@@ -24,7 +24,7 @@ Parameter
 
 Usage:
 ``````
-Use my script with get request (URL-Comming soon)
+Use my script with get request ("http://bastler.bplaced.net/api/grid.php?")
 Or download the PHP-File and run it localy.
 After you have done this you can load it as source in Maperitive and apply
 a special renderrule to visualize the grid. (See Examples)
@@ -32,7 +32,10 @@ a special renderrule to visualize the grid. (See Examples)
 
 Examples:
 `````````
-Comming soon
+you may want to lock in default_grid.mrules how to write a grid render rule
+(a better example comming soon - I hope)
+or just change paths and run the example.mscript with Maperitive to see first
+results
 
 
 TODO:
