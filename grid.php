@@ -22,10 +22,10 @@
  */
 
 //differenz between two lines e.g. equivalent to 500m
-//$delta_x = 0.007328667;
-//$delta_y = 0.00449325;
-$delta_x = 0.0007328667;
-$delta_y = 0.000449325;
+$delta_x = 0.007328667;
+$delta_y = 0.00449325;
+//$delta_x = 0.0007328667;
+//$delta_y = 0.000449325;
 
 if (isset($_GET['delta_x']))
 	$delta_x = $_GET['delta_x'];
@@ -74,8 +74,8 @@ if (isset($_GET['bottom']))
  //$ypos = $top-$boarder_high;
 
 //the start position of the grid (e.g. top left corner)
-$xpos = $left+1*$delta_x;
-$ypos = $top-1*$delta_y;
+$xpos = $left+$boarder_width;//1*$delta_x;
+$ypos = $top-$boarder_high;//1*$delta_y;
  
 if (isset($_GET['xpos']))
  $xpos = $_GET['xpos'];
@@ -199,6 +199,7 @@ function mod($big, $div) {
 	//left/right
 	for ($i=0; $i<$yend-$ystart; $i++) {
 		$tag = "";
+		//$tag = "\n\t\t<tag k='conflict' v='no' />";
 		if ($ypos < $top) {
 			//top left corner of the grid is in the map area
 			$tmp_ypos = $ypos+$delta_y/2-$i*$delta_y;
@@ -219,6 +220,7 @@ function mod($big, $div) {
 
 	//top/bottom
 	for ($i=0; $i<$xend-$xstart; $i++) {
+		//$tag = "\n\t\t<tag k='conflict' v='no' />";
 		$tag = "";
 		if ($xpos > $left)
 			//top left corner of the grid is in the map area
@@ -245,7 +247,7 @@ function mod($big, $div) {
 
 	//horizontal lines
 	for ($i=0; $i<$yend-$ystart-1; $i++) {
-		$tag = "";
+		$tag = "\n\t\t<tag k='conflict' v='no' />";
 		if ($ypos < $top)
 			//top left corner of the grid is in the map area
 			$tmp_ypos = $ypos-$i*$delta_y;
