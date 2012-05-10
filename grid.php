@@ -47,10 +47,16 @@ static $time = "2009-08-29T13:05:43Z";//Todo
 static $user = "theGrid";
 
 
+
 $left = 10.5321550369263;
 $right = 10.5363178253174;
 $top = 52.2712562711988;
 $bottom = 52.2697068495611;
+
+if (isset($_GET['mbbox'])) {
+	$bbox = substr($_GET['mbbox'], 6, strlen($_GET['mbbox'])-7);
+	list($left, $bottom, $right, $top) = explode(",", $bbox);
+}
 
 if (isset($_GET['left']))
 	$left = $_GET['left'];
@@ -68,8 +74,8 @@ if (isset($_GET['bottom']))
  //$ypos = $top-$boarder_high;
 
 //the start position of the grid (e.g. top left corner)
-$xpos = $left-1*$delta_x;
-$ypos = $top+1*$delta_y;
+$xpos = $left+1*$delta_x;
+$ypos = $top-1*$delta_y;
  
 if (isset($_GET['xpos']))
  $xpos = $_GET['xpos'];
@@ -111,8 +117,15 @@ function letter($id, $x, $y, $position, $tag) {
 	global $time, $user;
 	print "\t<node id='$id' timestamp='$time' user='$user' visible='true' version='1' lat='$y' lon='$x'>\n".
 		"\t\t<tag k='grid' v='letter' />\n".
-		"\t\t<tag k='letter:num' v='$position' />\n".
-		"\t\t<tag k='letter:alph' v='".num2alph($position)."' />\n".
+		"\t\t<tag k='letter:alph' v='".num2alph($position)."' />\n";
+
+	if ($position < 0) {
+		print
+			"\t\t<tag k='letter:num' v='' />\n".
+			"\t\t<tag k='outside_of_grid' v='yes' />\n";
+	}	else 
+		print "\t\t<tag k='letter:num' v='".($position+1)."' />\n";
+	print
 		"\t\t$tag\n".
 		"\t</node>\n";
 }
@@ -132,7 +145,7 @@ function n2a($num) {
  */
 function num2alph($number) {
 	$ret = "";
-	if ($number <0) return "Ä";
+	if ($number <0) return "";
 
 	while($number>=0) {
 		$ret = n2a($number%26).$ret;
@@ -171,26 +184,28 @@ function mod($big, $div) {
 
 
 	//where begin/end to Count
-	$xstart = floor(($left - $xpos) / $delta_x);//idx of first column intersecting bbox
+	//idx of first column intersecting bbox
+	$xstart = floor(($left - $xpos + 0.0000001) / $delta_x);//0.00000001 is a workaround to fix calc errors
 	$xend	  = ceil(($right - $xpos) / $delta_x);//idx of last column intersecting bbox
-	$ystart = floor(($ypos - $top) / $delta_y);//idx of first row intersecting bbox
+	$ystart = floor(($ypos - $top + 0.000001) / $delta_y);//idx of first row intersecting bbox
 	$yend   = ceil(($ypos - $bottom) / $delta_y);//idx of last row intersecting bbox
 	
 	//where is the first line - % didn't work
-	$xoffset = $delta_x - mod(floor(($left - $xpos)*1000000)/1000000, $delta_x);
-	$yoffset = $delta_y - mod(floor(($ypos - $top)*1000000)/1000000, $delta_y);
+	$xoffset = $delta_x - mod(floor(($left - $xpos)*100000)/100000, $delta_x);
+	$yoffset = $delta_y - mod(floor(($ypos - $top)*100000)/100000, $delta_y);
 
 
 	//generate Text
 	//left/right
 	for ($i=0; $i<$yend-$ystart; $i++) {
 		$tag = "";
-		if ($ypos < $top)
+		if ($ypos < $top) {
 			//top left corner of the grid is in the map area
 			$tmp_ypos = $ypos+$delta_y/2-$i*$delta_y;
-		else
+		} else {
 			$tmp_ypos = $top-$yoffset+$delta_y/2-$i*$delta_y;
 			//top left corner of the grid is not in the map area
+		}
 
 		if (($tmp_ypos > $top)||($tmp_ypos < $bottom)) continue;
 		if ($tmp_ypos > $top-$boarder_high)
@@ -238,6 +253,7 @@ function mod($big, $div) {
 			//top left corner of the grid is not in the map area
 			$tmp_ypos = $top-$yoffset-$i*$delta_y;
 
+		if (($tmp_ypos > $top)||($tmp_ypos < $bottom)) continue;
 		if ($tmp_ypos >= $top-$boarder_high)
 			//line is in the area of the top boarder
 			$tag ="\t\t<tag k='conflict' v='top' />\n";
@@ -258,6 +274,7 @@ function mod($big, $div) {
 			//top left corner of the grid is not in the map area
 			$tmp_xpos = $left+$xoffset+$i*$delta_x;
 
+		if (($tmp_xpos > $right)||($tmp_xpos < $left)) continue;
 		if ($tmp_xpos <= $left+$boarder_width)
 			//line is in the area of the left boarder
 			$tag ="\t\t<tag k='conflict' v='left' />\n";

@@ -1,10 +1,14 @@
 //this is an example how you can use the Grid
 clear-map 
-bounds-set 10.5321550369263,52.2697068495611,10.5363178253174,52.2712562711988
+bounds-set 10.5084,52.257,10.5384,52.2726
+
 use-ruleset location=Rules/default_grid.mrules
 apply-ruleset
-load-source maps/bs_small.osm
-download-osm xapi-url="http://bastler.bplaced.net/api/grid.php?"
 
-//export-osm file="example.osm"
+add-web-map provider="mapnik"
+
+//this call loads a map grid for the current bbox - important: "mbbox=" musst go last 
+download-osm xapi-url="http://bastler.bplaced.net/api/grid.php?delta_x=0.007328667&delta_y=0.00449325&mbbox="
+
+//export-osm file="grid.osm"
 //export-svg zoom=16 file=output/example.svg
