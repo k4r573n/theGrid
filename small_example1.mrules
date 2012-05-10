@@ -1,0 +1,87 @@
+features
+	points, areas
+		//GRID POIs
+		grid letter : grid=letter AND (letter:pos=top OR letter:pos=bottom)
+		grid number : grid=letter AND (letter:pos=left OR letter:pos=right)
+		grid debug : grid=letter AND (debug=origin)
+
+	areas
+		
+	lines
+		//Grid lines
+		grid conflict : grid=line AND (conflict="top" OR conflict="bottom"  OR conflict="left"  OR conflict="right")
+		grid lines : grid=line AND NOT (conflict="top" OR conflict="bottom"  OR conflict="left"  OR conflict="right")
+		grid boarder : grid=boarder
+
+		
+	points
+
+properties
+	map-background-color	: #F1EEE8
+	map-background-opacity	: 1
+	map-sea-color : #B5D0D0
+	font-weight : bold
+	font-family : Verdana
+	text-max-width : 7
+	text-halo-width : 25%
+	text-halo-opacity : 0.75
+	text-align-horizontal : center
+	text-align-vertical : center
+	font-stretch : 0.9
+	map.rendering.lflp.min-buffer-space : 5
+	map.rendering.lflp.max-allowed-corner-angle : 40
+	
+rules
+	//grid style
+	target : grid conflict
+		define
+			min-zoom : 13
+			line-color : #FF0000
+			line-width : 1
+		draw : line
+
+	target : grid lines
+		define
+			min-zoom : 13
+			line-color : #0000FF
+			line-width : 1
+		draw : line
+
+	target : grid boarder
+		define
+			min-zoom : 13
+			line-color : #FF00FF
+			line-width : 3
+		draw : line
+
+	target : grid number
+		define
+			min-zoom : 13
+			text-offset-vertical : 0
+			text-offset-horizontal : 0
+			font-size : 20
+			text-color : #FE802B
+			text : @if(conflict, "!" [[letter:num]] "!", [[letter:num]])
+		draw : text
+
+	target : grid letter
+		define
+			min-zoom : 13
+			text-offset-vertical : 0
+			text-offset-horizontal : 0
+			font-size : 20
+			text-color : #2B80FE
+			text : @if(conflict, "!" [[letter:alph]] "!", [[letter:alph]])
+		draw : text
+
+	target : grid debug
+		define
+			min-zoom : 13
+			text-offset-vertical : 0
+			text-offset-horizontal : 0
+			font-size : 20
+			text-color : #2B80FE
+			text : @if(debug, "X")
+		draw : text
+
+	//\\grid style
