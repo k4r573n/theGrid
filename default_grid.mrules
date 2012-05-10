@@ -64,9 +64,11 @@ features
 		aeroway terminal : aeroway=terminal
 		
 	lines
+		//Grid lines
 		grid conflict : grid=line AND (conflict="top" OR conflict="bottom"  OR conflict="left"  OR conflict="right")
 		grid lines : grid=line AND NOT (conflict="top" OR conflict="bottom"  OR conflict="left"  OR conflict="right")
 		grid boarder : grid=boarder
+
 		oneway : oneway=yes OR oneway=true OR oneway=-1
 		coastline : natural=coastline
 		river : waterway=river 
@@ -766,7 +768,7 @@ rules
 			text-offset-horizontal : 0
 			font-size : 20
 			text-color : #FE802B
-			text : @if(conflict, "!" [[letter:no]] "!", [[letter:no]])
+			text : @if(conflict, "!" [[letter:num]] "!", [[letter:num]])
 		draw : text
 
 	target : grid letter
