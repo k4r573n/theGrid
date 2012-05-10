@@ -32,8 +32,8 @@ if (isset($_GET['delta_x']))
 if (isset($_GET['delta_y']))
 	$delta_y = $_GET['delta_y'];
 
-$boarder_high = 0.000449325;
-$boarder_width = 0.0007328667;
+$boarder_width = $delta_x * 0.3;//0.0007328667;
+$boarder_high = $delta_y * 0.3;// 0.000449325;
 //static $boarder_width = 0.0007328667;
 //static $boarder_high = 0.000449325;
 
@@ -111,7 +111,7 @@ function letter($id, $x, $y, $position, $tag) {
 	global $time, $user;
 	print "\t<node id='$id' timestamp='$time' user='$user' visible='true' version='1' lat='$y' lon='$x'>\n".
 		"\t\t<tag k='grid' v='letter' />\n".
-		"\t\t<tag k='letter:no' v='$position' />\n".
+		"\t\t<tag k='letter:num' v='$position' />\n".
 		"\t\t<tag k='letter:alph' v='".num2alph($position)."' />\n".
 		"\t\t$tag\n".
 		"\t</node>\n";
@@ -177,15 +177,21 @@ function mod($big, $div) {
 	$yend   = ceil(($ypos - $bottom) / $delta_y);//idx of last row intersecting bbox
 	
 	//where is the first line - % didn't work
-	$xoffset = $delta_x - mod(floor(($left - $xpos)*10000)/10000, $delta_x);
-	$yoffset = $delta_y - mod(floor(($ypos - $top)*10000)/10000, $delta_y);
+	$xoffset = $delta_x - mod(floor(($left - $xpos)*1000000)/1000000, $delta_x);
+	$yoffset = $delta_y - mod(floor(($ypos - $top)*1000000)/1000000, $delta_y);
 
 
 	//generate Text
 	//left/right
 	for ($i=0; $i<$yend-$ystart; $i++) {
 		$tag = "";
-		$tmp_ypos = $top-$yoffset+$delta_y/2-$i*$delta_y;
+		if ($ypos < $top)
+			//top left corner of the grid is in the map area
+			$tmp_ypos = $ypos+$delta_y/2-$i*$delta_y;
+		else
+			$tmp_ypos = $top-$yoffset+$delta_y/2-$i*$delta_y;
+			//top left corner of the grid is not in the map area
+
 		if (($tmp_ypos > $top)||($tmp_ypos < $bottom)) continue;
 		if ($tmp_ypos > $top-$boarder_high)
 		 	$tag = "\n\t\t<tag k='conflict' v='top' />";
@@ -199,7 +205,13 @@ function mod($big, $div) {
 	//top/bottom
 	for ($i=0; $i<$xend-$xstart; $i++) {
 		$tag = "";
-		$tmp_xpos = $left+$xoffset-$delta_x/2+$i*$delta_x;
+		if ($xpos > $left)
+			//top left corner of the grid is in the map area
+			$tmp_xpos = $xpos-$delta_x/2+$i*$delta_x;
+		else
+			//top left corner of the grid is not in the map area
+			$tmp_xpos = $left+$xoffset-$delta_x/2+$i*$delta_x;
+
 		if (($tmp_xpos > $right)||($tmp_xpos < $left)) continue;
 		if ($tmp_xpos > $right-$boarder_width)
 		 	$tag = "\n\t\t<tag k='conflict' v='right' />";
@@ -210,33 +222,49 @@ function mod($big, $div) {
 	}
 	$nid = $nid+$i*2;//next ID
 
-	//debug
+	//debug point (top left corner of the grid)
 	letter($nid, $xpos, $ypos, 0, "<tag k='debug' v='origin' />");
 	$nid = $nid + 1;
 
 
 
+	//horizontal lines
 	for ($i=0; $i<$yend-$ystart-1; $i++) {
 		$tag = "";
-		if ($top-$yoffset-$i*$delta_y >= $top-$boarder_high)
+		if ($ypos < $top)
+			//top left corner of the grid is in the map area
+			$tmp_ypos = $ypos-$i*$delta_y;
+		else
+			//top left corner of the grid is not in the map area
+			$tmp_ypos = $top-$yoffset-$i*$delta_y;
+
+		if ($tmp_ypos >= $top-$boarder_high)
 			//line is in the area of the top boarder
 			$tag ="\t\t<tag k='conflict' v='top' />\n";
-		else if ($top-$yoffset-$i*$delta_y <= $bottom+$boarder_high)
+		else if ($tmp_ypos <= $bottom+$boarder_high)
 			//line is in the area of the bottom boarder
 			$tag ="\t\t<tag k='conflict' v='bottom' />\n";
-		hline($nid+$i, $top-$yoffset-$i*$delta_y, "<tag k='grid' v='line' />\n\t\t<tag k='line' v='horizontal' />\n".$tag);
+		hline($nid+$i, $tmp_ypos, "<tag k='grid' v='line' />\n\t\t<tag k='line' v='horizontal' />\n".$tag);
 	}
 	$nid = $nid+$i;//next ID
 
+	//vertical lines
 	for ($i=0; $i<$xend-$xstart-1; $i++) {
 		$tag = "";
-		if ($left+$xoffset+$i*$delta_x <= $left+$boarder_width)
+		if ($xpos > $left)
+			//top left corner of the grid is in the map area
+			$tmp_xpos = $xpos+$i*$delta_x;
+		else
+			//top left corner of the grid is not in the map area
+			$tmp_xpos = $left+$xoffset+$i*$delta_x;
+
+		if ($tmp_xpos <= $left+$boarder_width)
 			//line is in the area of the left boarder
 			$tag ="\t\t<tag k='conflict' v='left' />\n";
-		else if ($left+$xoffset+$i*$delta_x >= $right-$boarder_width)
+		else if ($tmp_xpos >= $right-$boarder_width)
 			//line is in the area of the right boarder
 			$tag ="\t\t<tag k='conflict' v='right' />\n";
-		vline($nid+$i, $left+$xoffset+$i*$delta_x, "<tag k='grid' v='line' />\n\t\t<tag k='line' v='vertical' />\n".$tag);
+		vline($nid+$i, $tmp_xpos, "<tag k='grid' v='line' />\n\t\t<tag k='line' v='vertical' />\n".$tag);
 	}
 	$nid = $nid+$i;//next ID
 

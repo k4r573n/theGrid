@@ -17,13 +17,13 @@ This script generates a map grid in osm xml.
 
 Parameter
  - left,right,top,bottom				
-		(map area)
+(map area)
  - xpos,ypos										
-		(start position/top left corner of the grid)
+(start position/top left corner of the grid)
  - delta_X,delta_y							
-		(x/y difference between two lines in degree)
+(x/y difference between two lines in degree)
  - boarder_high/boarder_width		
-		(size of the grid boarder)
+(size of the grid boarder in degree)
 
 
 Usage:
@@ -50,4 +50,4 @@ TODO:
 
 Bugs:
 `````
-- crazy things happen if xpos,ypos is in the map area
+- unknown
